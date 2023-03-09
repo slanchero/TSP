@@ -1,15 +1,15 @@
 from tkinter import *
-from tkinter import messagebox
 from tkinter import filedialog
+from Classes import *
 
 class GUI :
-    path=filedialog
 
     def __init__(self):
         self.root=Tk()
         self.nGeneraciones=StringVar(self.root)
         self.nPadres=StringVar(self.root)
         self.menu()
+        self.path=""
         self.root.mainloop()
     
     #-----------------MENU-------------#
@@ -22,7 +22,7 @@ class GUI :
         setMenu.add_command(label="SET",command=self.set)
         
     def abrirFichero(self):
-        self.path.askopenfile(title="abrir",filetypes=[("Excel separado por comas","*")])
+        self.path=filedialog.askopenfilename(title="abrir",filetypes=[("Excel separado por comas",".txt")])
     
     def validate_entry(self,input):
         if input.isdigit() or input == "":
@@ -52,8 +52,32 @@ class GUI :
         print(self.path)
         print(self.nPadres.get())
         print(self.nGeneraciones.get())
+        self.readFile()
         popup.destroy()
     
     #-------------------COMPONENTES----------------------#
 
     #-------------------LEER ARCHIVO---------------------#
+
+    def readFile(self):
+
+        self.map=Map()
+        i=1
+
+        with open(self.path, 'r') as archivo:
+            lineas = archivo.readlines()
+
+        for linea in lineas:
+            if i==3:
+                city.addY(int(linea))
+                self.map.add(city)
+                print("y: "+linea)
+                i=1
+            elif i==2:
+                city.addX(int(linea))
+                print("x: "+linea)
+                i=3
+            else:
+                city=City(linea)
+                print("ciudad: "+linea)
+                i=2

@@ -1,0 +1,9 @@
+Barranquilla
+1
+2
+Bogota
+0
+3
+Soledad
+5
+2

@@ -19,6 +19,7 @@ class City:
     def getY(self):
         return self.y
     
+
 class Map:
     def __init__(self):
         self.cities=[]
@@ -50,3 +51,32 @@ class Map:
         copy = self.cities[a]
         self.cities[a] = self.cities[b]
         self.cities[b] = copy
+    
+    def _is_valid_operand(self, other):
+        return (hasattr(other, "score"))
+
+    def __eq__(self, map):
+        if not self._is_valid_operand(map):
+            return NotImplemented
+        return (self.score==map.score)
+
+    def __lt__(self, map):
+        if not self._is_valid_operand(map):
+            return NotImplemented
+        return (self.score<map.score)
+
+    def __le__(self, map):
+        if not self._is_valid_operand(map):
+            return NotImplemented
+        return (self.score<=map.score)
+
+    def __gt__(self, map):
+        if not self._is_valid_operand(map):
+            return NotImplemented
+        return (self.score>map.score)
+    
+    def __ge__(self, map):
+        if not self._is_valid_operand(map):
+            return NotImplemented
+        return (self.score>=map.score)
+

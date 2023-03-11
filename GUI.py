@@ -110,8 +110,8 @@ class GUI:
             self.pp=self.selectParents()
 
     def selectParents(self):
-        
-        print("Hola")
+        self.p.sort()
+        pass
 
     # -------------------LEER ARCHIVO---------------------#
 

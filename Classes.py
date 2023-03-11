@@ -51,6 +51,7 @@ class Map:
         copy = self.cities[a]
         self.cities[a] = self.cities[b]
         self.cities[b] = copy
+        self.evaluate()
     
     def _is_valid_operand(self, other):
         return (hasattr(other, "score"))

@@ -111,7 +111,7 @@ class GUI:
 
     def selectParents(self):
         self.p.sort()
-        pass
+        print(self.p)
 
     # -------------------LEER ARCHIVO---------------------#
 

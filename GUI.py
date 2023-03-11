@@ -109,6 +109,9 @@ class GUI:
             self.pp=self.selectParents()
             self.pc=self.reproduction()
             self.mutate()
+            self.pp.extend(self.pc)
+            self.pp.sort()
+            self.pp = self.pp[:int(self.nPadres.get)]
             i=i+1
 
     #-----------------------Seleccion de mejores genes------------------#

@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import filedialog
 from Classes import *
-
+import random
 
 class GUI:
 
@@ -60,10 +60,10 @@ class GUI:
 
     # -------------------COMPONENTES----------------------#
     def components(self):
-        startBtn = Button(self.root,text="Start",command=lambda:(startBtn.destroy(), self.selectParents()))
+        startBtn = Button(self.root,text="Start",command=lambda:(startBtn.destroy(), self.typeParents()))
         startBtn.pack()
     #--------------------Seleccionar padres---------------#
-    def selectParents(self):
+    def typeParents(self):
         self.stringParents=[]
         for i in range(int(self.nPadres.get())):
             self.stringParents.append(StringVar(self.root))
@@ -87,9 +87,6 @@ class GUI:
                 for city in self.map.cities:
                     if city.name.strip().__eq__(cityS.strip()):
                         mapa.add(city)
-                        print("encontrado")
-                    else:
-                        print("no encontrado")
             
             self.p.append(mapa)
             
@@ -97,6 +94,8 @@ class GUI:
         for padre in self.p:
             padre.evaluate()
             print(padre.score)
+            
+        self.AG()
         
 
         
@@ -108,11 +107,33 @@ class GUI:
 
         while i<int(self.nGeneraciones.get()):
             self.pp=self.selectParents()
+            self.pc=self.reproduction()
+            self.mutate()
+            i=i+1
 
+    #-----------------------Seleccion de mejores genes------------------#
+    
     def selectParents(self):
         self.p.sort()
-        print(self.p)
+        
+        return self.p[:int(self.nPadres.get())-1]
+    
+    #------------------------Reproduccion de padres--------------------#
 
+    def reproduction(self):
+        children=[]
+        for i in range(len(self.pp)-1):
+            children.append(self.pp[i].reproduce(self.pp[i+1]))
+        
+        return children
+        
+    #----------------------------Mutar----------------------------#
+    def mutate(self):
+        a=random.randint(0,len(self.pc))
+        b=random.randint(0,100)
+        if b<10:
+            self.pc[a].mutate()
+    
     # -------------------LEER ARCHIVO---------------------#
 
     def readFile(self):

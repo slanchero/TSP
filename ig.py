@@ -1,10 +1,9 @@
-from tkinter import *
 
-raiz=Tk()
+lista=[1,2,3,4]
+i=0
+print(lista[i+1])
+print(lista[i-1])
 
-mi_boton=Button(raiz,text="...",command=lambda:print(mi_boton.cget("text")))
-
-mi_boton.pack()
 
 # texto_boton = mi_boton.cget("text")
 
@@ -24,4 +23,4 @@ mi_boton.pack()
 # label1=Label(frame,text="hola",bg="black",fg="white")
 # label1.pack()
 
-raiz.mainloop()
+# raiz.mainloop()

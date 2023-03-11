@@ -19,6 +19,9 @@ class City:
     def getY(self):
         return self.y
     
+    def __repr__(self):
+        return "" + str(self.name)+ ""
+    
 
 class Map:
     def __init__(self):
@@ -48,8 +51,6 @@ class Map:
         else:
             son.add(self.cities[0])
             best = self
-        #neighbors [3,2,3,4]
-        #[0,1,2,4,3,5]74 , [0,1,4,2,3,5]82 = [0,1,2,4,3]
     
         
         for i in range(len(self.cities)-1):
@@ -72,8 +73,8 @@ class Map:
                             min=self.distance(son.cities[-1],city)
                             minCity=city
             
-            son.append(minCity)
-        
+            son.add(minCity)
+        son.evaluate()
         return son
             
 
@@ -124,3 +125,10 @@ class Map:
                 return True
         
         return False
+
+    def imprimir(self):
+        text="["
+        for city in self.cities:
+            text=text+""+city.name+","
+        text=text+"]"
+        return text

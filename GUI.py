@@ -2,15 +2,17 @@ from tkinter import *
 from tkinter import filedialog
 from Classes import *
 import random
+from tkinter import messagebox
 
 class GUI:
 
     def __init__(self):
         self.root = Tk()
-        self.nGeneraciones = StringVar(self.root)
-        self.nPadres = StringVar(self.root)
+        self.nGeneraciones = StringVar(self.root,value="2")
+        self.nPadres = StringVar(self.root,value="3")
         self.p = []
         self.pc = []
+        self.path=None
         self.menu()
         self.components()
         self.root.mainloop()
@@ -27,8 +29,8 @@ class GUI:
     def abrirFichero(self):
         self.path = filedialog.askopenfilename(title="abrir", filetypes=[("Archivo de texto plano", ".txt")])
 
-    def validate_entry(self, input):
-        if input.isdigit() or input == "":
+    def validate_entry(self, new_value):
+        if new_value.isdigit():
             return True
         else:
             return False
@@ -37,47 +39,55 @@ class GUI:
         popup = Toplevel(self.root)
         popup.title("Set")
         popup.geometry("300x300")
-
-        vcmd = (self.root.register(self.validate_entry), '%P')
+        vcmd=(self.root.register(self.validate_entry), '%P')
 
         label1 = Label(popup, text="Path", pady=20).grid(row=0, column=0, padx=20)
         pathBtn = Button(popup, text="Escoger archivo",command=self.abrirFichero).grid(row=0, column=1)
 
         label2 = Label(popup, text="# Padres").grid(row=1, column=0, padx=20)
-        entryPadres = Entry(popup, textvariable=self.nPadres,validate="key", validatecommand=vcmd).grid(row=1, column=1)
+        entryPadres = Spinbox(popup, from_=3, to=10**100, validate="key",textvariable=self.nPadres, validatecommand=vcmd).grid(row=1, column=1)
 
         label3 = Label(popup, text="# Generaciones",pady=20).grid(row=2, column=0, padx=20)
-        entryGEN = Entry(popup, textvariable=self.nGeneraciones,validate="key", validatecommand=vcmd).grid(row=2, column=1)
+        entryGEN = Spinbox(popup, from_=2, to=10**100, validate="key",textvariable=self.nGeneraciones, validatecommand=vcmd).grid(row=2, column=1)
 
         sendBtn = Button(popup, text="Listo",command=lambda: self.save(popup)).grid(row=3,column=0,columnspan=2)
 
-    def save(self, popup):
-        self.readFile()
-        self.visitadas = {}
-        for city in self.map.cities:
-            self.visitadas[city.name] = False
-        popup.destroy()
+    def save(self, popup): 
+        if self.path is not None:
+            self.readFile()
+            self.visitadas = {}
+            for city in self.map.cities:
+                self.visitadas[city.name] = False
+            popup.destroy()
+        else:
+            messagebox.showwarning("Advertencia", "Debe escoger la direccion del dataset de ciudades.")
+        
 
     # -------------------COMPONENTES----------------------#
     def components(self):
         startBtn = Button(self.root,text="Start",command=lambda:(startBtn.destroy(), self.typeParents()))
         startBtn.pack()
+    
     #--------------------Seleccionar padres---------------#
     def typeParents(self):
-        self.stringParents=[]
-        for i in range(int(self.nPadres.get())):
-            self.stringParents.append(StringVar(self.root))
-            Label(self.root,text=("Ingrese el orden de las ciudades para el padre "+str(i+1)+" :")).grid(row=i+1,column=0)
-            Entry(self.root,textvariable=self.stringParents[i]).grid(row=i+1,column=1)
-        
-        texto="Ciudades disponibles: \n"
+        if self.path is not None:
+            self.stringParents=[]
+            for i in range(int(self.nPadres.get())):
+                self.stringParents.append(StringVar(self.root))
+                Label(self.root,text=("Ingrese el orden de las ciudades para el padre "+str(i+1)+" :")).grid(row=i+1,column=0)
+                Entry(self.root,textvariable=self.stringParents[i]).grid(row=i+1,column=1)
+            
+            texto="Ciudades disponibles: \n"
 
-        for city in self.map.cities:
-            texto=texto+"-"+city.name+"\n"
+            for city in self.map.cities:
+                texto=texto+"-"+city.name+"\n"
 
-        Label(self.root,text=texto).grid(row=0,column=2,rowspan=4)
+            Label(self.root,text=texto).grid(row=0,column=2,rowspan=4)
 
-        Button(self.root,text="Enviar",command=self.crearPadres).grid(row=4,column=2)
+            Button(self.root,text="Enviar",command=self.crearPadres).grid(row=4,column=2)
+        else:
+            messagebox.showwarning("Advertencia", "Debe escoger la direccion del dataset de ciudades.")
+            self.components()
 
     def crearPadres(self):
         for mapS in self.stringParents:
@@ -89,17 +99,15 @@ class GUI:
                         mapa.add(city)
             
             self.p.append(mapa)
-            
         
         for padre in self.p:
             padre.evaluate()
             print(padre.score)
-            
+        
         self.AG()
         
-
         
-    #--------Calculo de Generaciones------------------------------------#
+    #--------Algoritmo Genetico------------------------------------#
 
     def AG(self):
         
@@ -109,10 +117,10 @@ class GUI:
             self.pp=self.selectParents()
             self.pc=self.reproduction()
             self.mutate()
-            self.pp.extend(self.pc)
-            self.pp.sort()
-            self.pp = self.pp[:int(self.nPadres.get)]
+            self.nextGen()
             i=i+1
+        
+        self.showLastGen()
 
     #-----------------------Seleccion de mejores genes------------------#
     
@@ -126,7 +134,7 @@ class GUI:
     def reproduction(self):
         children=[]
         for i in range(len(self.pp)-1):
-            children.append(self.pp[i].reproduce(self.pp[i+1]))
+            children.append(self.pp[i].reproduce(self.pp[(i+1)%len(self.pp)]))
         
         return children
         
@@ -137,6 +145,12 @@ class GUI:
         if b<10:
             self.pc[a].mutate()
     
+    #--------------------------Siguiente Gneracion----------------#
+    def nextGen(self):
+        self.p.extend(self.pc)
+        self.p.sort()
+        self.p=self.p[:int(self.nPadres.get())]
+
     # -------------------LEER ARCHIVO---------------------#
 
     def readFile(self):
@@ -158,3 +172,14 @@ class GUI:
             else:
                 city = City(linea)
                 i = 2
+
+    #---------------------Mostrar Ultima Generacion------------------------------#
+    def showLastGen(self):
+        texto=""
+        for map in self.p:
+            texto=texto+""+map.imprimir()+"\n"
+            texto=texto+"Score: "+str(map.score)+"\n"
+            texto=texto+"-----------------------------\n"
+        Label(self.root,text="Ultima Generacion",font=("Arial", 12, "bold")).grid(row=4,column=2)
+        Label(self.root,text=texto).grid(row=5,column=2,columnspan=6)
+        

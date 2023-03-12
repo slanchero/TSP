@@ -6,7 +6,7 @@ Solving the traveling salesman with our implementation of a genetic algorithm wi
 * [Sources](#Sources)
 
 ## General info
-This is the a lab for optimization class
+This is a lab for optimization class
 
 ## Technologies
 * Python 3.11.2

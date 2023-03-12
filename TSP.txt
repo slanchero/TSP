@@ -7,3 +7,9 @@ Bogota
 Soledad
 5
 2
+Malambo
+10
+2
+Santa Marta
+8
+10

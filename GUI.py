@@ -72,10 +72,10 @@ class GUI:
     def typeParents(self):
         if self.path is not None:
             self.stringParents=[]
-            for i in range(int(self.nPadres.get())):
-                self.stringParents.append(StringVar(self.root))
-                Label(self.root,text=("Ingrese el orden de las ciudades para el padre "+str(i+1)+" :")).grid(row=i+1,column=0)
-                Entry(self.root,textvariable=self.stringParents[i]).grid(row=i+1,column=1)
+#            for i in range(int(self.nPadres.get())):
+#               self.stringParents.append(StringVar(self.root))
+#                Label(self.root,text=("Ingrese el orden de las ciudades para el padre "+str(i+1)+" :")).grid(row=i+1,column=0)
+#                Entry(self.root,textvariable=self.stringParents[i]).grid(row=i+1,column=1)
             
             texto="Ciudades disponibles: \n"
 
@@ -84,7 +84,7 @@ class GUI:
 
             Label(self.root,text=texto).grid(row=0,column=2,rowspan=4)
 
-            Button(self.root,text="Enviar",command=self.crearPadres).grid(row=4,column=2)
+            Button(self.root,text="Enviar",command=self.padresAleatoreos).grid(row=4,column=2)
         else:
             messagebox.showwarning("Advertencia", "Debe escoger la direccion del dataset de ciudades.")
             self.components()
@@ -105,8 +105,30 @@ class GUI:
             print(padre.score)
         
         self.AG()
+    ##-----------------Padres aleatorios-------------------------------#
+    def padresAleatoreos(self):
+        i=0
+        while i<int(self.nPadres.get()):
+            temp=Map()
+            b = self.map.cities.copy()
+            while(b.__len__()>0):
+                temp.add(b.pop(random.randint(0,len(b)-1)))
+            
+            match = False    
+            for map in self.p:
+                if map.equals(temp):
+                    match = True
+            self.p.append(temp)
+            if match:
+                self.p.pop()
+            else:
+                i = i+1
         
-        
+        for padre in self.p:
+            padre.evaluate()  
+
+        self.AG() 
+    
     #--------Algoritmo Genetico------------------------------------#
 
     def AG(self):
@@ -140,8 +162,8 @@ class GUI:
         
     #----------------------------Mutar----------------------------#
     def mutate(self):
-        a=random.randint(0,len(self.pc))
-        b=random.randint(0,100)
+        a=random.randint(0,len(self.pc)-1)
+        b=random.randint(1,100)
         if b<10:
             self.pc[a].mutate()
     
@@ -178,7 +200,7 @@ class GUI:
         texto=""
         for map in self.p:
             texto=texto+""+map.imprimir()+"\n"
-            texto=texto+"Score: "+str(map.score)+"\n"
+            texto=texto+"Recorrido: "+str(map.score)+" unds\n"
             texto=texto+"-----------------------------\n"
         Label(self.root,text="Ultima Generacion",font=("Arial", 12, "bold")).grid(row=4,column=2)
         Label(self.root,text=texto).grid(row=5,column=2,columnspan=6)

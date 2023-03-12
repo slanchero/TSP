@@ -77,6 +77,17 @@ class Map:
         son.evaluate()
         return son
             
+    def equals(self, other:"Map"):
+        match = 0
+        i = 0
+        while i<len(self.cities):
+            if(self.cities[i].name.lower()==other.cities[i].name.lower()):
+                match = match +1
+            i = i+1
+        if match==len(self.cities):
+            return True
+        return False
+
 
     def mutate(self):
         check = True
